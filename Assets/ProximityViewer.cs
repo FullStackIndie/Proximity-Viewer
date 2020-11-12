@@ -30,7 +30,7 @@ public class ProximityViewer : MonoBehaviour
 
     private float yaw = 0.0f;
     private float pitch = 0.0f;
-    ///////////////////////////////////////////
+    //////////////////////////////////////////
 
     // Update is called once per frame
     void Update()
