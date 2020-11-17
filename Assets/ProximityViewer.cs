@@ -42,6 +42,7 @@ public class ProximityViewer : MonoBehaviour
             // checks list to see if the current gameobject that was hit exists
             if (hitObjs.Contains(hitCollider.gameObject))
             {
+                
                 Debug.Log($"Already contains {hitCollider.gameObject.name}");
             }
             else
