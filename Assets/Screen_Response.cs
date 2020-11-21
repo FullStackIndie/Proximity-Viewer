@@ -76,6 +76,7 @@ public class Screen_Response : MonoBehaviour
                     point1.y = 1080 -Input.mousePosition.y - heightMax;
 
 
+                    
 
 
 

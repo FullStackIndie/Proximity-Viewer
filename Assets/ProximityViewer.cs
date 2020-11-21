@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic; // need this to use List<>
 using System.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 // this script should be on your Camera and your camera should have a collider on it
 // feel free to change, edit, distribute this code
@@ -20,6 +21,7 @@ public class ProximityViewer : MonoBehaviour
     float distanceBetween;
     // List to store gameobjects we have prevoiusly hit with the camera
     List<GameObject> hitObjs = new List<GameObject>();
+    Scene scene = new Scene();
 
     //////////////////////////////////////////////
     // Camera movement Variables from Fuzzy Logic
@@ -32,25 +34,40 @@ public class ProximityViewer : MonoBehaviour
     private float pitch = 0.0f;
     //////////////////////////////////////////
 
+
+
+    private void Start()
+    {
+        scene = SceneManager.GetActiveScene();
+        GameObject[] allGameObjects = scene.GetRootGameObjects();
+        foreach(GameObject go in allGameObjects)
+        {
+            if (go.GetComponent<Renderer>())
+            {
+               hitObjs.Add(go);
+            }
+
+        }
+    }
     // Update is called once per frame
     void Update()
     {
         // Scan from the position of the camera(assuming this script is attached to the camera)
-        Collider[] hitColliders = Physics.OverlapSphere(transform.position, cameraSearchRadius); // Unity Docs OverlapSphere
-        foreach (var hitCollider in hitColliders)
-        {
-            // checks list to see if the current gameobject that was hit exists
-            if (hitObjs.Contains(hitCollider.gameObject))
-            {
+        //Collider[] hitColliders = Physics.OverlapSphere(transform.position, cameraSearchRadius); // Unity Docs OverlapSphere
+        //foreach (var hitCollider in hitColliders)
+        //{
+        //    // checks list to see if the current gameobject that was hit exists
+        //    if (hitObjs.Contains(hitCollider.gameObject))
+        //    {
                 
-                Debug.Log($"Already contains {hitCollider.gameObject.name}");
-            }
-            else
-            {
-                // adds hit gameobject to the list
-                hitObjs.Add(hitCollider.gameObject);
-            }
-        }
+        //        Debug.Log($"Already contains {hitCollider.gameObject.name}");
+        //    }
+        //    else
+        //    {
+        //        // adds hit gameobject to the list
+        //        hitObjs.Add(hitCollider.gameObject);
+        //    }
+        //}
 
             // searches the list of scanned gameobjects
             foreach (GameObject go in hitObjs)
@@ -60,11 +77,18 @@ public class ProximityViewer : MonoBehaviour
                 {
                     // gets the distance between the camera(assuming script is attached to camera) and gameobject that has been prevouisly scanned
                     distanceBetween = Vector3.Distance(transform.position, go.transform.position);
+                
+                
                     // if the distnace between camera and gameobject is greater than the closeDistance
                     if (distanceBetween > closeDistance)
                     {
-                        // turns on the gameobject renderer because it is farther than the closeDistnace from the camera and within the cameras Scanning radius
-                        go.gameObject.GetComponent<Renderer>().enabled = true;
+                        if (go.activeSelf != enabled)
+                        {
+                            go.gameObject.SetActive(true);
+                        }
+                       // turns on the gameobject renderer because it is farther than the closeDistnace from the camera and within the cameras Scanning radius
+                       go.gameObject.GetComponent<Renderer>().enabled = true;
+                        
 
                         // You can substitute <Renderer> for the <MeshRenderer>
                         // go.GetComponent<MeshRenderer>().enabled = true;
@@ -74,6 +98,7 @@ public class ProximityViewer : MonoBehaviour
                         // turns off the gameobject renderer because it is farther than the farDistance specified
                         go.gameObject.GetComponent<Renderer>().enabled = false;
                     }
+                
                 }
             }
 
@@ -107,4 +132,6 @@ public class ProximityViewer : MonoBehaviour
         }
 
     }
+
+
 }
