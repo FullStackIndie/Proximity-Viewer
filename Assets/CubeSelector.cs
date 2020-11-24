@@ -1,24 +1,25 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 
-// Commented for further understanding and for future viewers of this code
+// No license no need to credit me personally
+// Please keep the links where I borrowed code from to credit the original author's
 public class CubeSelector : MonoBehaviour
 {
-    Vector2 CubeSpawnPosition;
-    public GameObject cubePrefab; // your cube prefab
-    public int CurrentCubeInList = 0;
-    public static int nameCounter = 1; // keeps track of how many cubes have been created
-
+    [Header("Cube Prefab References")]
+    public GameObject cubePrefab; 
     public static List<GameObject> CubeList = new List<GameObject>();
 
-    void Start()
-    {
-        CubeSpawnPosition = new Vector2(5, 10);
-    }
-
+    [Header("Cube Properties")]
+    public static float maxDistance = 50f; // how far from camera will the mouse click register // Z-axis
+    public float cubeSpeed = 2f; // how fast cube moves
+    [SerializeField] private Color selectedCubeColor;
+    [SerializeField] private int CurrentCubeInList = 0;
+    [SerializeField] private Vector3 CubeSpawnPosition; // default is Vector3(0f, 0f, 0f)
+    [SerializeField] private static int nameCounter = 1; // keeps track of how many cubes have been created
+    
     void Update()
     {
-        if (Input.GetKeyDown("right"))
+        if (Input.GetKeyDown("right")) // cycles thru cubes
         {
             if (CurrentCubeInList >= CubeList.Count - 1)
             {
@@ -30,7 +31,7 @@ public class CubeSelector : MonoBehaviour
             }
         }
 
-        if (Input.GetKeyDown("left"))
+        if (Input.GetKeyDown("left")) // cycles thru cubes
         {
            if (CurrentCubeInList <= 0)
             {
@@ -49,42 +50,43 @@ public class CubeSelector : MonoBehaviour
             }
         }
 
-       if(CubeList.Count > 0)
+        
+        if (CubeList.Count >= 0)
         {
             foreach (GameObject cube in CubeList)
-            {
-                if (cube == CubeList[CurrentCubeInList])
+            {      
+                CubeController cubeController = cube.GetComponent<CubeController>(); // Gets CubeController from cube
+
+                if (CubeList.IndexOf(cube) != CurrentCubeInList)
                 {
-                    cube.GetComponent<CubeController>().enabled = true; // turns On the CubeController script so only the selected cube will move
+                    cube.GetComponent<Renderer>().material.color = cubeController.originalColor; // changes all cubes back to starting color
                 }
                 else
                 {
-                    cube.GetComponent<CubeController>().enabled = false;// turns Off all other CubeController scripts so only the selected cube will move
+                    cube.GetComponent<Renderer>().material.color = selectedCubeColor; // changes the color of selected cube
+                }
+                
+
+                if (cube == CubeList[CurrentCubeInList] && Input.GetMouseButtonDown(0))
+                { 
+                    // gets mouse position and adjusts the Z-axis
+                    cubeController.originalMousePosition = Input.mousePosition;
+                    cubeController.originalMousePosition.z = maxDistance;
+
+                    cubeController.cubeTargetPosition = Camera.main.ScreenToWorldPoint(cubeController.originalMousePosition);
+                    // moves the cube to new destination // Time.deltaTime makes it smooth(framerate independent so its not jittery)
+                    cube.transform.position = Vector3.MoveTowards(cube.transform.position, cubeController.cubeTargetPosition, cubeSpeed * Time.deltaTime); 
+                    Debug.Log($"{cube.name} is now moving to new position at :  {cubeController.cubeTargetPosition}");
                 }
             }
         }
 
         if (Input.GetKeyDown(KeyCode.Space))
         {
-            if(CubeList.Count > 0) // only runs if CubeList is populated
-            {
-                foreach(GameObject cube in CubeList) // Search the cube list
-                {
-                    if(cube == CubeList[CurrentCubeInList])
-                    {
-                        cube.GetComponent<CubeController>().enabled = true; // keeps selected cube on
-                    }
-                    else
-                    {
-                        cube.GetComponent<CubeController>().enabled = false; // turns off all other cubes
-                    }
-                }
-            }
-
             GameObject thisCube; // Temp variable to access the instantiated prefab
             thisCube = Instantiate(cubePrefab, CubeSpawnPosition, Quaternion.identity);
             thisCube.name = $"Cube {nameCounter}";
-            nameCounter++;
+            nameCounter++; // adds 1 to the name counter
             thisCube.GetComponent<CubeController>().enabled = true; // makes sure new cube can move
             CubeList.Add(thisCube); // adds new cube to list
             if(CubeList.Count > 1)

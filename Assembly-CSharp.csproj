@@ -64,11 +64,11 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\BotMover.cs" />
     <Compile Include="Assets\CubeController.cs" />
     <Compile Include="Assets\CubeSelector.cs" />
     <Compile Include="Assets\ProximityViewer.cs" />
     <Compile Include="Assets\Screen_Response.cs" />
-    <Compile Include="Assets\Test.cs" />
     <Reference Include="UnityEngine">
       <HintPath>C:/Program Files/Unity/Hub/Editor/2019.4.13f1/Editor/Data/Managed/UnityEngine/UnityEngine.dll</HintPath>
     </Reference>
